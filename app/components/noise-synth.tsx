@@ -1,0 +1,320 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+
+// Minimal ambient types for RNBO
+declare global {
+  interface Window {
+    RNBO?: any;
+    webkitAudioContext?: typeof AudioContext;
+    guardrails?: (ctx?: any) => void;
+  }
+}
+
+const PATCH_URL = "/rnbo-export/pm1.export.json";
+const DEP_URL = "/rnbo-export/dependencies.json"; // optional
+
+// Exact parameter ids based on your JSON
+const PARAM_IDS = {
+  volume: "gain-output",
+  startStop: "start/stop",
+  filterBands: [
+    "gain-bp-30",
+    "gain-bp-60",
+    "gain-bp-125",
+    "gain-bp-250",
+    "gain-bp-500",
+    "gain-bp-1k",
+    "gain-bp-2k",
+    "gain-bp-4k",
+    "gain-bp-8k",
+    "gain-bp-16k",
+  ],
+} as const;
+
+export default function NoiseSynth() {
+  const [running, setRunning] = useState(false);
+
+  // Volume binds directly to RNBO param "gain-output" (0..1)
+  const [vol, setVol] = useState<number>(0);
+
+  // 10 filter-band gains (0..1 by your JSON)
+  const [bands, setBands] = useState<number[]>(Array.from({ length: 10 }, () => 0));
+
+  // Refs to audio / rnbo objects
+  const ctxRef = useRef<AudioContext | null>(null);
+  const deviceRef = useRef<any>(null);
+  const startStopParamRef = useRef<any>(null);
+  const volumeParamRef = useRef<any>(null);
+  const filterParamRefs = useRef<any[]>([]);
+  const initialized = useRef(false);
+
+  useEffect(() => {
+    if (initialized.current) return;
+    initialized.current = true;
+    (async () => {
+      await setup();
+    })();
+
+    return () => {
+      try {
+        deviceRef.current?.node?.disconnect?.();
+        if (ctxRef.current?.state === "running") ctxRef.current.suspend();
+      } catch {}
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ------ UI Handlers ------
+  const toggleAudio = async () => {
+    const ctx = ctxRef.current;
+    if (!ctx) return;
+
+    const isRunning = ctx.state === "running";
+    if (isRunning) {
+      await ctx.suspend();
+      setRunning(false);
+      if (startStopParamRef.current) startStopParamRef.current.value = 0;
+    } else {
+      await ctx.resume();
+      setRunning(true);
+      if (startStopParamRef.current) startStopParamRef.current.value = 1;
+    }
+  };
+
+  const onVolumeChange = (v: number) => {
+    setVol(v);
+    if (volumeParamRef.current) {
+      volumeParamRef.current.value = v;
+    }
+  };
+
+  const onBandChange = (index: number, v: number) => {
+    setBands((arr) => {
+      const next = [...arr];
+      next[index] = v;
+      return next;
+    });
+    const param = filterParamRefs.current[index];
+    if (param) param.value = v;
+  };
+
+  return (
+    <div>
+      {/* Transport */}
+      <section className="rounded-2xl border border-neutral-800 p-4 mb-6">
+        <h2 className="font-medium mb-2">Playback</h2>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={toggleAudio}
+            className={`px-4 py-2 rounded-2xl border border-neutral-700 ${
+              running ? "bg-green-200 text-green-900" : "bg-neutral-200 text-neutral-900"
+            }`}
+          >
+            {running ? "Stop" : "Start"}
+          </button>
+          {/* <p className="text-neutral-400 text-sm">Start/Stop sets the RNBO "start/stop" param and resumes/suspends the AudioContext.</p> */}
+        </div>
+      </section>
+
+      {/* Volume (gain-output) */}
+      <section className="rounded-2xl border border-neutral-800 p-4 mb-6">
+        <h2 className="font-medium mb-2">Output Gain</h2>
+        <div className="flex items-center gap-3">
+          <input
+            type="range"
+            min={0}
+            max={1}
+            step={0.001}
+            value={vol}
+            onChange={(e) => onVolumeChange(Number(e.target.value))}
+            className="w-full"
+          />
+          <span className="text-sm w-20 text-right">{vol.toFixed(3)}</span>
+        </div>
+        {/* <p className="text-neutral-500 text-xs mt-2">Bound to RNBO parameter <code>{PARAM_IDS.volume}</code>.</p> */}
+      </section>
+
+      {/* Filter Bank (10 bands) */}
+      <section className="rounded-2xl border border-neutral-800 p-4">
+        <h2 className="font-medium mb-3">Filter Bank Gain (10 bands)</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {bands.map((val, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <label className="w-28 text-sm font-extrabold text-black truncate" title={PARAM_IDS.filterBands[i]}>
+                {PARAM_IDS.filterBands[i]}
+              </label>
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.001}
+                value={val}
+                onChange={(e) => onBandChange(i, Number(e.target.value))}
+                className="w-full"
+              />
+              <span className="text-sm w-16 text-right">{val.toFixed(3)}</span>
+            </div>
+          ))}
+        </div>
+        {/* <p className="text-neutral-500 text-xs mt-3">
+          Each slider maps to its respective RNBO parameter id.
+        </p> */}
+      </section>
+    </div>
+  );
+
+  // ------------- inner helpers -------------
+  async function setup() {
+    // Create AudioContext
+    const WAContext: typeof AudioContext =
+      (window.AudioContext as any) || window.webkitAudioContext!;
+    const context = new WAContext();
+    ctxRef.current = context;
+
+    // Fetch the exported patcher
+    let response: Response | undefined;
+    let patcher: any;
+    try {
+      response = await fetch(PATCH_URL);
+      patcher = await response.json();
+
+      if (!window.RNBO) {
+        await loadRNBOScript(patcher.desc.meta.rnboversion);
+      }
+    } catch (err) {
+      const errorContext: any = { error: err };
+      if (response && (response.status >= 300 || response.status < 200)) {
+        errorContext.header = `Couldn't load patcher export bundle`;
+        errorContext.description = `Tried to load "${PATCH_URL}". Ensure your RNBO export is in /public/rnbo-export.`;
+      }
+      if (typeof window.guardrails === "function") window.guardrails(errorContext);
+      else console.error(err);
+      return;
+    }
+
+    // Optional dependencies (e.g., samples)
+    let dependencies: any[] = [];
+    try {
+      const depRes = await fetch(DEP_URL);
+      if (depRes.ok) {
+        dependencies = await depRes.json();
+        dependencies = dependencies.map((d: any) =>
+          d.file ? Object.assign({}, d, { file: "/rnbo-export/" + d.file }) : d
+        );
+      }
+    } catch {}
+
+    // Create device
+    let device: any;
+    try {
+      device = await (window as any).RNBO.createDevice({ context, patcher });
+    } catch (err) {
+      if (typeof window.guardrails === "function") window.guardrails({ error: err });
+      else console.error(err);
+      return;
+    }
+
+    if (dependencies.length) await device.loadDataBufferDependencies(dependencies);
+
+    // Connect device to speakers directly (no extra master gain since gain is inside the patch)
+    device.node.connect(context.destination);
+    deviceRef.current = device;
+
+    // ---- Apply audible defaults so the patch isn't silent ----
+    const paramsArr: any[] = Array.from(device.parameters || []);
+    const byId = (id: string) => paramsArr.find((p: any) => p.paramId === id || p.name === id);
+
+    // Set output gain to a reasonable level
+    const volP = byId(PARAM_IDS.volume);
+    if (volP) {
+      volP.value = 0.8; // default audible level
+      setVol(0.8);
+      volumeParamRef.current = volP;
+    }
+
+    // Give the 10 bands some gain
+    const initBands: number[] = [];
+    PARAM_IDS.filterBands.forEach((id, i) => {
+      const p = byId(id);
+      if (p) {
+        p.value = 0.7;
+        initBands[i] = 0.7;
+      } else {
+        initBands[i] = 0;
+      }
+    });
+    setBands(initBands);
+
+    // Start the patch's transport/state
+    const startP = byId(PARAM_IDS.startStop);
+    if (startP) startP.value = 1;
+
+    // ------- Reflect internal parameter changes in the UI -------
+    device.parameterChangeEvent?.subscribe((param: any) => {
+      if (param.paramId === PARAM_IDS.volume || param.name === PARAM_IDS.volume) {
+        setVol(Number(param.value) || 0);
+        return;
+      }
+      const idx = PARAM_IDS.filterBands.findIndex((id) => id === param.paramId || id === param.name);
+      if (idx >= 0) {
+        setBands((arr) => {
+          const next = [...arr];
+          next[idx] = Number(param.value) || 0;
+          return next;
+        });
+      }
+    });
+
+    // Title in parent page (if present)
+    const title = document.getElementById("patcher-title");
+    if (title) {
+      title.textContent = `${patcher.desc.meta?.filename || "PM1"} (v${patcher.desc.meta?.rnboversion})`;
+    }
+
+    // Resolve parameters by paramId (fall back to name if needed)
+    const findParam = (id: string) =>
+      device.parameters.find((p: any) => p.paramId === id || p.name === id);
+
+    // Volume param
+    const volParam = findParam(PARAM_IDS.volume);
+    if (volParam) {
+      volumeParamRef.current = volParam;
+      setVol(Number(volParam.value) || 0);
+    }
+
+    // Start/Stop param
+    startStopParamRef.current = findParam(PARAM_IDS.startStop) || null;
+
+    // Filter band params (in declared order)
+    filterParamRefs.current = PARAM_IDS.filterBands.map((id) => findParam(id));
+    setBands(
+      filterParamRefs.current.map((p) => (p ? Number(p.value) || 0 : 0))
+    );
+
+    // Autoplay policy helper
+    document.body.onclick = () => {
+      if (context.state !== "running") context.resume();
+    };
+  }
+}
+
+function loadRNBOScript(version: string) {
+  return new Promise<void>((resolve, reject) => {
+    if (/^\d+\.\d+\.\d+-dev$/.test(version)) {
+      reject(new Error("Debug RNBO version exported—please export with a release RNBO version."));
+      return;
+    }
+    const el = document.createElement("script");
+    el.src =
+      "https://c74-public.nyc3.digitaloceanspaces.com/rnbo/" +
+      encodeURIComponent(version) +
+      "/rnbo.min.js";
+    el.onload = () => resolve();
+    el.onerror = (err) => {
+      console.log(err);
+      reject(new Error("Failed to load rnbo.js v" + version));
+    };
+    document.body.append(el);
+  });
+}
