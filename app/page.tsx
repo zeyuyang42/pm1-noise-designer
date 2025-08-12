@@ -19,7 +19,7 @@ export default function Home() {
       <section className="grid grid-cols-2">
       <Image
           // className="mx-auto my-auto"
-          src="pm1-top.svg"
+          src="pm1.svg"
           alt="phone"
           width={1224}
           height={765}
