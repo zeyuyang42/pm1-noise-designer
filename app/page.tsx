@@ -1,12 +1,13 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-// import pm1Top from "./components/pm1-top";
+import Pm1Top from "./components/pm1-top";
 import NoiseSynth from "./components/noise-synth";
+// import Pm1Top from "@/public/pm1-top.svg";
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-import Pm1Top from "./components/pm1-top";
+
 
 
 function SliderTwoPages({ children }: { children: React.ReactNode }) {
@@ -15,7 +16,7 @@ function SliderTwoPages({ children }: { children: React.ReactNode }) {
 
   const router = useRouter();
 
-    useEffect(() => {
+  useEffect(() => {
     if (typeof window !== "undefined" && window.innerWidth < 1024) {
       router.replace("/mobile-notice");
     }
@@ -71,19 +72,17 @@ export default function Home() {
       <SliderTwoPages>
 
         {/* Page 2: SVGs (full viewport) */}
-        <section className="h-screen w-screen">
-          <div className="h-full w-full flex items-center justify-center">
-            {/* Option A: inline responsive SVG component */}
-            {/* <div style={{ aspectRatio: "1224 / 765" }} className="relative w-full max-w-[1224px]">
-              <Pm1Top className="absolute inset-0 w-full h-full" />
-            </div> */}
-
-            {/* Option B (existing images). If you prefer these, replace the block above with this grid: */}
-            <div className="grid grid-cols-1 gap-6 items-center justify-center justify-items-center place-content-center place-items-center">
-              <Image className="shadow-2xl" src="pm1.svg" alt="pm1" width={1000} height={765} unoptimized />
-              {/* <Image src="phone.svg" alt="phone" width={350} height={350} unoptimized /> */}
-            </div>
-
+        <section className="h-screen w-screen flex items-center justify-center">
+          <div className="h-full w-full justify-items-center place-content-center place-items-center">
+            {/* <Image className="shadow-2xl" src="pm1.svg" alt="pm1" width={1000} height={765} unoptimized /> */}
+            <Pm1Top
+              className="shadow-2xl"
+              onMainButtonClick={() => {
+                // do your thing here (toggle, start/stop, change param, etc.)
+                console.log("Start SVG button clicked!");
+              }}
+            />
+            {/* <Image src="phone.svg" alt="phone" width={350} height={350} unoptimized /> */}
           </div>
         </section>
         {/* Page 1: NoiseSynth (full viewport) */}

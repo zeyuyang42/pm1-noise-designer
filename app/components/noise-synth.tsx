@@ -71,7 +71,7 @@ export default function NoiseSynth() {
       try {
         deviceRef.current?.node?.disconnect?.();
         if (ctxRef.current?.state === "running") ctxRef.current.suspend();
-      } catch {}
+      } catch { }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -123,49 +123,53 @@ export default function NoiseSynth() {
   return (
     <div>
       {/* Transport */}
-      <section className="rounded-2xl border border-neutral-800 p-4 mb-6">
-        <h2 className="font-medium mb-2">Playback</h2>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={toggleAudio}
-            className={`px-4 py-2 rounded-2xl border border-neutral-700 ${
-              running ? "bg-start-button text-neutral-900" : "bg-neutral-200 text-neutral-900"
-            }`}
-          >
-            {running ? "Stop" : "Start"}
-          </button>
-          <div className="flex items-center gap-2 ml-2">
+      <div className="grid grid-cols-2 gap-4 ">
+        <section className="rounded-2xl border border-neutral-800 p-4 mb-6">
+          <h2 className="font-medium mb-2">Playback</h2>
+          <div className="flex items-center gap-3">
             <button
-              onClick={() => applyPreset(0)}
-              className={`px-3 py-1 rounded-xl border border-neutral-700 text-sm ${
-                channel === 0 ? "bg-neutral-900 text-white" : "bg-neutral-200 text-neutral-900"
-              }`}
-              title="Channel 1: Flat preset"
+              onClick={toggleAudio}
+              className={`px-4 py-2 rounded-2xl border border-neutral-700 ${running ? "bg-start-button text-neutral-900" : "bg-neutral-200 text-neutral-900"
+                }`}
             >
-              Ch 1
-            </button>
-            <button
-              onClick={() => applyPreset(1)}
-              className={`px-3 py-1 rounded-xl border border-neutral-700 text-sm ${
-                channel === 1 ? "bg-neutral-900 text-white" : "bg-neutral-200 text-neutral-900"
-              }`}
-              title="Channel 2: Pink noise preset"
-            >
-              Ch 2
-            </button>
-            <button
-              onClick={() => applyPreset(2)}
-              className={`px-3 py-1 rounded-xl border border-neutral-700 text-sm ${
-                channel === 2 ? "bg-neutral-900 text-white" : "bg-neutral-200 text-neutral-900"
-              }`}
-              title="Channel 3: Brown noise preset"
-            >
-              Ch 3
+              {running ? "Stop" : "Start"}
             </button>
           </div>
-          {/* <p className="text-neutral-400 text-sm">Start/Stop sets the RNBO "start/stop" param and resumes/suspends the AudioContext.</p> */}
-        </div>
-      </section>
+        </section>
+
+        <section className="rounded-2xl border border-neutral-800 p-4 mb-6">
+          <h2 className="font-medium mb-2">Channel Selection</h2>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 ml-2">
+              <button
+                onClick={() => applyPreset(0)}
+                className={`px-3 py-1 rounded-xl border border-neutral-700 text-sm ${channel === 0 ? "bg-neutral-900 text-white" : "bg-neutral-200 text-neutral-900"
+                  }`}
+                title="Channel 1: Flat preset"
+              >
+                Ch 1
+              </button>
+              <button
+                onClick={() => applyPreset(1)}
+                className={`px-3 py-1 rounded-xl border border-neutral-700 text-sm ${channel === 1 ? "bg-neutral-900 text-white" : "bg-neutral-200 text-neutral-900"
+                  }`}
+                title="Channel 2: Pink noise preset"
+              >
+                Ch 2
+              </button>
+              <button
+                onClick={() => applyPreset(2)}
+                className={`px-3 py-1 rounded-xl border border-neutral-700 text-sm ${channel === 2 ? "bg-neutral-900 text-white" : "bg-neutral-200 text-neutral-900"
+                  }`}
+                title="Channel 3: Brown noise preset"
+              >
+                Ch 3
+              </button>
+            </div>
+            {/* <p className="text-neutral-400 text-sm">Start/Stop sets the RNBO "start/stop" param and resumes/suspends the AudioContext.</p> */}
+          </div>
+        </section>
+      </div>
 
       {/* Volume (gain-output) */}
       <section className="rounded-2xl border border-neutral-800 p-4 mb-6">
@@ -258,7 +262,7 @@ export default function NoiseSynth() {
           d.file ? Object.assign({}, d, { file: "/rnbo-export/" + d.file }) : d
         );
       }
-    } catch {}
+    } catch { }
 
     // Create device
     let device: any;
