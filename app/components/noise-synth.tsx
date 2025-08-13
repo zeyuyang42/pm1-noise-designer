@@ -32,6 +32,16 @@ const PARAM_IDS = {
   ],
 } as const;
 
+// Three channel presets for the 10 filter bands (0..1)
+const PRESET_BANDS: number[][] = [
+  // Channel 1: Flat (0.70 across)
+  [0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7, 0.7],
+  // Channel 2: Pink noise
+  [0.85, 0.83, 0.80, 0.78, 0.75, 0.72, 0.70, 0.68, 0.65, 0.62],
+  // Channel 3: Brown noise
+  [0.95, 0.90, 0.85, 0.78, 0.70, 0.62, 0.55, 0.48, 0.40, 0.35],
+];
+
 export default function NoiseSynth() {
   const [running, setRunning] = useState(false);
 
@@ -40,6 +50,7 @@ export default function NoiseSynth() {
 
   // 10 filter-band gains (0..1 by your JSON)
   const [bands, setBands] = useState<number[]>(Array.from({ length: 10 }, () => 0));
+  const [channel, setChannel] = useState<number>(0);
 
   // Refs to audio / rnbo objects
   const ctxRef = useRef<AudioContext | null>(null);
@@ -99,6 +110,16 @@ export default function NoiseSynth() {
     if (param) param.value = v;
   };
 
+  const applyPreset = (idx: number) => {
+    const preset = PRESET_BANDS[idx];
+    if (!preset) return;
+    setBands(preset);
+    filterParamRefs.current.forEach((p, i) => {
+      if (p) p.value = preset[i];
+    });
+    setChannel(idx);
+  };
+
   return (
     <div>
       {/* Transport */}
@@ -113,6 +134,35 @@ export default function NoiseSynth() {
           >
             {running ? "Stop" : "Start"}
           </button>
+          <div className="flex items-center gap-2 ml-2">
+            <button
+              onClick={() => applyPreset(0)}
+              className={`px-3 py-1 rounded-xl border border-neutral-700 text-sm ${
+                channel === 0 ? "bg-neutral-900 text-white" : "bg-neutral-200 text-neutral-900"
+              }`}
+              title="Channel 1: Flat preset"
+            >
+              Ch 1
+            </button>
+            <button
+              onClick={() => applyPreset(1)}
+              className={`px-3 py-1 rounded-xl border border-neutral-700 text-sm ${
+                channel === 1 ? "bg-neutral-900 text-white" : "bg-neutral-200 text-neutral-900"
+              }`}
+              title="Channel 2: Pink noise preset"
+            >
+              Ch 2
+            </button>
+            <button
+              onClick={() => applyPreset(2)}
+              className={`px-3 py-1 rounded-xl border border-neutral-700 text-sm ${
+                channel === 2 ? "bg-neutral-900 text-white" : "bg-neutral-200 text-neutral-900"
+              }`}
+              title="Channel 3: Brown noise preset"
+            >
+              Ch 3
+            </button>
+          </div>
           {/* <p className="text-neutral-400 text-sm">Start/Stop sets the RNBO "start/stop" param and resumes/suspends the AudioContext.</p> */}
         </div>
       </section>
@@ -128,7 +178,7 @@ export default function NoiseSynth() {
             step={0.001}
             value={vol}
             onChange={(e) => onVolumeChange(Number(e.target.value))}
-            className="w-full"
+            className="w-full accent-black bg-neutral-300 rounded"
           />
           <span className="text-sm w-20 text-right">{vol.toFixed(3)}</span>
         </div>
@@ -138,12 +188,18 @@ export default function NoiseSynth() {
       {/* Filter Bank (10 bands) */}
       <section className="rounded-2xl border border-neutral-800 p-4">
         <h2 className="font-medium mb-3">Filter Bank Gain (10 bands)</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-10 gap-4">
           {bands.map((val, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <label className="w-28 text-sm font-extrabold text-black truncate" title={PARAM_IDS.filterBands[i]}>
-                {PARAM_IDS.filterBands[i]}
+            <div key={i} className="grid grid-cols-1 items-center gap-3">
+              <label className="text-sm font-bold text-black" title={PARAM_IDS.filterBands[i]}>
+                {/* 8 is the magic number to the center frequency suffix in the paramid */}
+                {/* e.g: gain-bp-30 -> 30 */}
+                {PARAM_IDS.filterBands[i].substring(8)}
               </label>
+
+              {/* value chip */}
+              {/* <div className="text-[10px] font-mono text-neutral-600">{(val * 100).toFixed(0)}%</div> */}
+
               <input
                 type="range"
                 min={0}
@@ -151,15 +207,14 @@ export default function NoiseSynth() {
                 step={0.001}
                 value={val}
                 onChange={(e) => onBandChange(i, Number(e.target.value))}
-                className="w-full"
+                onDoubleClick={() => onBandChange(i, 0.7)}
+                className="w-full accent-black bg-neutral-300 rounded"
+                style={{ writingMode: "vertical-rl", direction: "rtl" }}
               />
-              <span className="text-sm w-16 text-right">{val.toFixed(3)}</span>
+              <span className="text-sm w-8 text-right">{val.toFixed(3)}</span>
             </div>
           ))}
         </div>
-        {/* <p className="text-neutral-500 text-xs mt-3">
-          Each slider maps to its respective RNBO parameter id.
-        </p> */}
       </section>
     </div>
   );
@@ -292,10 +347,6 @@ export default function NoiseSynth() {
       filterParamRefs.current.map((p) => (p ? Number(p.value) || 0 : 0))
     );
 
-    // Autoplay policy helper
-    document.body.onclick = () => {
-      if (context.state !== "running") context.resume();
-    };
   }
 }
 
