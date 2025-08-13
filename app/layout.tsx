@@ -35,8 +35,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-b from-bg-gray-dark to-bg-gray-light`}
       >
         {children}
+        <FixedLogos />
       </body>
-      <FixedLogos />
     </html>
   );
 }
