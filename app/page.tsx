@@ -4,12 +4,22 @@ import { useEffect, useRef, useState } from "react";
 import NoiseSynth from "./components/noise-synth";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+
 import Pm1Top from "./components/pm1-top";
 
 
 function SliderTwoPages({ children }: { children: React.ReactNode }) {
   const [active, setActive] = useState(0); // 0 = first page, 1 = second page
   const containerRef = useRef<HTMLDivElement | null>(null);
+
+  const router = useRouter();
+
+    useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+      router.replace("/mobile-notice");
+    }
+  }, [router]);
 
   // Keyboard and wheel fallbacks
   useEffect(() => {
@@ -69,9 +79,9 @@ export default function Home() {
             </div> */}
 
             {/* Option B (existing images). If you prefer these, replace the block above with this grid: */}
-            <div className="grid grid-cols-2 gap-6 items-center justify-center justify-items-center place-content-center place-items-center">
-              <Image src="pm1.svg" alt="pm1" width={1224} height={765} unoptimized />
-              <Image src="phone.svg" alt="phone" width={350} height={350} unoptimized />
+            <div className="grid grid-cols-1 gap-6 items-center justify-center justify-items-center place-content-center place-items-center">
+              <Image className="shadow-2xl" src="pm1.svg" alt="pm1" width={1000} height={765} unoptimized />
+              {/* <Image src="phone.svg" alt="phone" width={350} height={350} unoptimized /> */}
             </div>
 
           </div>

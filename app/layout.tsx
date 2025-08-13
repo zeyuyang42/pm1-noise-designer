@@ -4,6 +4,11 @@ import "./globals.css";
 
 import FixedLogos from "./components/fixed-logos";
 
+import dynamic from 'next/dynamic'
+ 
+// const FixedLogos = dynamic(() => import('./components/fixed-logos'), { ssr: false })
+
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
