@@ -42,6 +42,9 @@ const PRESET_BANDS: number[][] = [
   [0.95, 0.90, 0.85, 0.78, 0.70, 0.62, 0.55, 0.48, 0.40, 0.35],
 ];
 
+// Optional: matching volume presets per channel
+const PRESET_VOLS: number[] = [0.8, 0.8, 0.8];
+
 export default function NoiseSynth() {
   const [running, setRunning] = useState(false);
 
@@ -51,6 +54,20 @@ export default function NoiseSynth() {
   // 10 filter-band gains (0..1 by your JSON)
   const [bands, setBands] = useState<number[]>(Array.from({ length: 10 }, () => 0));
   const [channel, setChannel] = useState<number>(0);
+
+  // Editable presets (initialized from constants; will be saved per session)
+  const [bandPresets, setBandPresets] = useState<number[][]>(() => {
+    try {
+      const fromLS = localStorage.getItem("pm1_bandPresets");
+      return fromLS ? JSON.parse(fromLS) : PRESET_BANDS;
+    } catch { return PRESET_BANDS; }
+  });
+  const [volPresets, setVolPresets] = useState<number[]>(() => {
+    try {
+      const fromLS = localStorage.getItem("pm1_volPresets");
+      return fromLS ? JSON.parse(fromLS) : PRESET_VOLS;
+    } catch { return PRESET_VOLS; }
+  });
 
   // Refs to audio / rnbo objects
   const ctxRef = useRef<AudioContext | null>(null);
@@ -111,13 +128,28 @@ export default function NoiseSynth() {
   };
 
   const applyPreset = (idx: number) => {
-    const preset = PRESET_BANDS[idx];
+    const preset = bandPresets[idx];
     if (!preset) return;
     setBands(preset);
-    filterParamRefs.current.forEach((p, i) => {
-      if (p) p.value = preset[i];
-    });
+    filterParamRefs.current.forEach((p, i) => { if (p) p.value = preset[i]; });
+
+    const v = volPresets[idx] ?? vol;
+    setVol(v);
+    if (volumeParamRef.current) volumeParamRef.current.value = v;
+
     setChannel(idx);
+  };
+
+  const savePresetToCurrentChannel = () => {
+    const idx = channel;
+    // Save bands
+    const nextBands = bandPresets.map((arr, i) => (i === idx ? [...bands] : arr));
+    setBandPresets(nextBands);
+    try { localStorage.setItem("pm1_bandPresets", JSON.stringify(nextBands)); } catch {}
+    // Save volume
+    const nextVols = volPresets.map((v, i) => (i === idx ? vol : v));
+    setVolPresets(nextVols);
+    try { localStorage.setItem("pm1_volPresets", JSON.stringify(nextVols)); } catch {}
   };
 
   return (
@@ -129,7 +161,7 @@ export default function NoiseSynth() {
           <div className="flex items-center gap-3">
             <button
               onClick={toggleAudio}
-              className={`px-4 py-2 rounded-2xl border border-neutral-700 ${running ? "bg-start-button text-neutral-900" : "bg-neutral-200 text-neutral-900"
+              className={`px-4 py-2 rounded-2xl border border-neutral-700 hover:brightness-95 ${running ? "bg-start-button text-neutral-900" : "bg-neutral-200 text-neutral-900"
                 }`}
             >
               {running ? "Stop" : "Start"}
@@ -165,8 +197,15 @@ export default function NoiseSynth() {
               >
                 Ch 3
               </button>
+              <br className="my-2" />
+              <button
+                onClick={savePresetToCurrentChannel}
+                className="ml-4 px-3 py-1 rounded-xl border border-neutral-700 text-sm bg-neutral-200 text-neutral-900 hover:brightness-95"
+                title="Save current sliders & volume to this channel"
+              >
+                Save
+              </button>
             </div>
-            {/* <p className="text-neutral-400 text-sm">Start/Stop sets the RNBO "start/stop" param and resumes/suspends the AudioContext.</p> */}
           </div>
         </section>
       </div>
