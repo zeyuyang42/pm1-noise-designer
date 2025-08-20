@@ -5,7 +5,17 @@ import NoiseSynth from "./components/noise-synth";
 
 import SliderTwoPages from "./components/slider-two-pages";
 
+import { useState } from "react";
+
 export default function Home() {
+  const presets: { [key: string]: string } = {
+    Channel1: "white.",
+    Channel2: "pink.",
+    Channel3: "brown.",
+  };
+
+  const [label, setLabel] = useState(presets.Channel1);
+
   return (
     <div
       className="relative overflow-hidden h-screen w-screen"
@@ -18,11 +28,11 @@ export default function Home() {
           <div className="h-full w-full justify-items-center place-content-center place-items-center">
             <Pm1Top
               className="shadow-2xl"
-              onPeaceButtonClick={() => { console.log("Peace button clicked!"); }}
-              onChannel1ButtonClick={() => { console.log("Channel 1 button clicked!"); }}
-              onChannel2ButtonClick={() => { console.log("Channel 2 button clicked!"); }}
-              onChannel3ButtonClick={() => { console.log("Channel 3 button clicked!"); }}
-              label="hello."
+              onPeaceButtonClick={() => {  }}
+              onChannel1ButtonClick={() => { setLabel(presets.Channel1); }}
+              onChannel2ButtonClick={() => { setLabel(presets.Channel2); }}
+              onChannel3ButtonClick={() => { setLabel(presets.Channel3); }}
+              label={label}
             />
           </div>
         </section>
