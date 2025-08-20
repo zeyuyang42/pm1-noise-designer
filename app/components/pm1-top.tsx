@@ -7,15 +7,20 @@ const Pm1Top = (props: React.SVGProps<SVGSVGElement> & {
   onChannel2ButtonClick?: () => void,
   onChannel3ButtonClick?: () => void,
   label?: string
+  isRunning?: boolean
+  activeChannel?: number
 }) => ((({
   onPeaceButtonClick,
   onChannel1ButtonClick,
   onChannel2ButtonClick,
   onChannel3ButtonClick,
-  label, ...rest }) => {
+  label,
+  isRunning,
+  activeChannel,
+  ...rest }) => {
 
-  const [activeChannel, setActiveChannel] = React.useState('ch1');
-  const [peaceOn, setPeaceOn] = React.useState(false);
+  // const [activeChannel, setActiveChannel] = React.useState('ch1');
+  // const [peaceOn, setPeaceOn] = React.useState(false);
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -109,7 +114,7 @@ const Pm1Top = (props: React.SVGProps<SVGSVGElement> & {
           transformOrigin: 'center',
         }}
         onClick={() => {
-          setPeaceOn((p) => !p);
+          // setPeaceOn((p) => !p);
           props.onPeaceButtonClick?.();
         }}
         onPointerDown={(e) => {
@@ -222,8 +227,8 @@ const Pm1Top = (props: React.SVGProps<SVGSVGElement> & {
           transformOrigin: 'center',
         }}
         onClick={() => {
-          if (peaceOn) {
-            setActiveChannel('ch1');
+          if (isRunning) {
+            // setActiveChannel('ch1');
             props.onChannel1ButtonClick?.();
           }
         }}
@@ -277,8 +282,8 @@ const Pm1Top = (props: React.SVGProps<SVGSVGElement> & {
           transformOrigin: 'center',
         }}
         onClick={() => {
-          if (peaceOn) {
-            setActiveChannel('ch2');
+          if (isRunning) {
+            // setActiveChannel('ch2');
             props.onChannel2ButtonClick?.();
           }
         }}
@@ -332,8 +337,8 @@ const Pm1Top = (props: React.SVGProps<SVGSVGElement> & {
           transformOrigin: 'center',
         }}
         onClick={() => {
-          if (peaceOn) {
-            setActiveChannel('ch3');
+          if (isRunning) {
+            // setActiveChannel('ch3');
             props.onChannel3ButtonClick?.();
           }
         }}
@@ -400,17 +405,17 @@ const Pm1Top = (props: React.SVGProps<SVGSVGElement> & {
         stroke="#A8A8A8"
         strokeWidth={0.444}
       />
-      {peaceOn && activeChannel === 'ch1' && (
+      {isRunning && activeChannel === 0 && (
         <g filter="url(#LED1)">
           <circle cx={487.994} cy={358.034} r={3.549} fill="#fff" />
         </g>
       )}
-      {peaceOn && activeChannel === 'ch2' && (
+      {isRunning && activeChannel === 1 && (
         <g filter="url(#LED2)">
           <circle cx={568.735} cy={358.034} r={3.549} fill="#fff" />
         </g>
       )}
-      {peaceOn && activeChannel === 'ch3' && (
+      {isRunning && activeChannel === 2 && (
         <g filter="url(#LED3)">
           <circle cx={649.476} cy={358.034} r={3.549} fill="#fff" />
         </g>
