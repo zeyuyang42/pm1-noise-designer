@@ -1,13 +1,25 @@
 import * as React from "react"
-const Pm1Top = (props: React.SVGProps<SVGSVGElement> & { onMainButtonClick?: () => void }) => (
-  (({ onMainButtonClick, ...rest }) => (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={899}
-      height={424}
-      fill="none"
-      {...rest}
-    >
+
+
+const Pm1Top = (props: React.SVGProps<SVGSVGElement> & {
+  onPeaceButtonClick?: () => void,
+  onChannel1ButtonClick?: () => void,
+  onChannel2ButtonClick?: () => void,
+  onChannel3ButtonClick?: () => void,
+  label?: string
+}) => ((({
+  onPeaceButtonClick,
+  onChannel1ButtonClick,
+  onChannel2ButtonClick,
+  onChannel3ButtonClick,
+  label, ...rest }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={899}
+    height={424}
+    fill="none"
+    {...rest}
+  >
     <path fill="#F5F5F5" d="M0 0h899v424H0z" />
     <path
       fill="url(#a)"
@@ -81,7 +93,7 @@ const Pm1Top = (props: React.SVGProps<SVGSVGElement> & { onMainButtonClick?: () 
     <g
       filter="url(#i)"
       role="button"
-      aria-label="Main button"
+      aria-label="Peace button"
       tabIndex={0}
       pointerEvents="visible"
       style={{
@@ -92,7 +104,7 @@ const Pm1Top = (props: React.SVGProps<SVGSVGElement> & { onMainButtonClick?: () 
         transformBox: 'fill-box',
         transformOrigin: 'center',
       }}
-      onClick={() => props.onMainButtonClick?.()}
+      onClick={() => props.onPeaceButtonClick?.()}
       onPointerDown={(e) => {
         const t = e.currentTarget as SVGGElement;
         t.dataset.pressed = 'true';
@@ -189,7 +201,37 @@ const Pm1Top = (props: React.SVGProps<SVGSVGElement> & { onMainButtonClick?: () 
         strokeWidth={0.887}
       />
     </g>
-    <g filter="url(#q)">
+    <g filter="url(#q)"
+      role="button"
+      aria-label="Channel1 button"
+      tabIndex={0}
+      pointerEvents="visible"
+      style={{
+        cursor: 'pointer',
+        outline: 'none',
+        // smooth press/hover transitions
+        transition: 'transform 80ms ease, filter 120ms ease',
+        transformBox: 'fill-box',
+        transformOrigin: 'center',
+      }}
+      onClick={() => props.onChannel1ButtonClick?.()}
+      onPointerDown={(e) => {
+        const t = e.currentTarget as SVGGElement;
+        t.dataset.pressed = 'true';
+        t.style.transform = 'scale(0.96)';
+        t.style.filter = 'brightness(0.85)';
+        const mainCircle = t.querySelector('circle');
+        if (mainCircle) mainCircle.setAttribute('fill', '#D8D2CB');
+      }}
+      onPointerUp={(e) => {
+        const t = e.currentTarget as SVGGElement;
+        delete t.dataset.pressed;
+        t.style.transform = 'scale(1)';
+        t.style.filter = '';
+        const mainCircle = t.querySelector('circle');
+        if (mainCircle) mainCircle.setAttribute('fill', '#D8D2CB');
+      }}
+    >
       <circle cx={487.556} cy={318.556} r={23.518} fill="#D8D2CB" />
       <circle
         cx={487.556}
@@ -209,7 +251,37 @@ const Pm1Top = (props: React.SVGProps<SVGSVGElement> & { onMainButtonClick?: () 
         strokeWidth={0.887}
       />
     </g>
-    <g filter="url(#s)">
+    <g filter="url(#s)"
+      role="button"
+      aria-label="Channel2 button"
+      tabIndex={0}
+      pointerEvents="visible"
+      style={{
+        cursor: 'pointer',
+        outline: 'none',
+        // smooth press/hover transitions
+        transition: 'transform 80ms ease, filter 120ms ease',
+        transformBox: 'fill-box',
+        transformOrigin: 'center',
+      }}
+      onClick={() => props.onChannel2ButtonClick?.()}
+      onPointerDown={(e) => {
+        const t = e.currentTarget as SVGGElement;
+        t.dataset.pressed = 'true';
+        t.style.transform = 'scale(0.96)';
+        t.style.filter = 'brightness(0.85)';
+        const mainCircle = t.querySelector('circle');
+        if (mainCircle) mainCircle.setAttribute('fill', '#D8D2CB');
+      }}
+      onPointerUp={(e) => {
+        const t = e.currentTarget as SVGGElement;
+        delete t.dataset.pressed;
+        t.style.transform = 'scale(1)';
+        t.style.filter = '';
+        const mainCircle = t.querySelector('circle');
+        if (mainCircle) mainCircle.setAttribute('fill', '#D8D2CB');
+      }}
+    >
       <circle cx={568.297} cy={318.556} r={23.518} fill="#D8D2CB" />
       <circle
         cx={568.297}
@@ -229,7 +301,37 @@ const Pm1Top = (props: React.SVGProps<SVGSVGElement> & { onMainButtonClick?: () 
         strokeWidth={0.887}
       />
     </g>
-    <g filter="url(#u)">
+    <g filter="url(#u)"
+      role="button"
+      aria-label="Channel3 button"
+      tabIndex={0}
+      pointerEvents="visible"
+      style={{
+        cursor: 'pointer',
+        outline: 'none',
+        // smooth press/hover transitions
+        transition: 'transform 80ms ease, filter 120ms ease',
+        transformBox: 'fill-box',
+        transformOrigin: 'center',
+      }}
+      onClick={() => props.onChannel3ButtonClick?.()}
+      onPointerDown={(e) => {
+        const t = e.currentTarget as SVGGElement;
+        t.dataset.pressed = 'true';
+        t.style.transform = 'scale(0.96)';
+        t.style.filter = 'brightness(0.85)';
+        const mainCircle = t.querySelector('circle');
+        if (mainCircle) mainCircle.setAttribute('fill', '#D8D2CB');
+      }}
+      onPointerUp={(e) => {
+        const t = e.currentTarget as SVGGElement;
+        delete t.dataset.pressed;
+        t.style.transform = 'scale(1)';
+        t.style.filter = '';
+        const mainCircle = t.querySelector('circle');
+        if (mainCircle) mainCircle.setAttribute('fill', '#D8D2CB');
+      }}
+    >
       <circle cx={649.037} cy={318.556} r={23.518} fill="#D8D2CB" />
       <circle
         cx={649.037}
@@ -253,6 +355,14 @@ const Pm1Top = (props: React.SVGProps<SVGSVGElement> & { onMainButtonClick?: () 
       <path fill="url(#y)" d="M146.985 375.769h16.658v19.598h-16.658z" />
     </g>
     <circle
+      cx={487.994}
+      cy={358.034}
+      r={3.327}
+      fill="url(#z)"
+      stroke="#A8A8A8"
+      strokeWidth={0.444}
+    />
+    <circle
       cx={649.476}
       cy={358.034}
       r={3.327}
@@ -270,6 +380,7 @@ const Pm1Top = (props: React.SVGProps<SVGSVGElement> & { onMainButtonClick?: () 
     />
     <g filter="url(#B)">
       <circle cx={487.994} cy={358.034} r={3.549} fill="#fff" />
+      {/* <circle cx={649.476} cy={358.034} r={3.549} fill="#fff" /> */}
     </g>
     <g filter="url(#C)">
       <circle cx={249.875} cy={212.126} r={23.518} fill="#D8D2CB" />
@@ -313,10 +424,27 @@ const Pm1Top = (props: React.SVGProps<SVGSVGElement> & { onMainButtonClick?: () 
         rx={14.717}
       />
     </g>
-    <path
+    <text
+      style={{
+        cursor: 'default',
+        outline: 'none',
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
+        MozUserSelect: 'none',
+        msUserSelect: 'none',
+        pointerEvents: 'none',
+      }} // make the text unselectable
+      x={369}
+      y={328}
       fill="#fff"
-      d="M336.272 330.784h5.324v-1.774h-5.324v1.774Zm-1.774-1.845h1.774v-1.704h5.324v-1.775h-5.324v-1.774h5.324v1.774h1.774v7.099h-7.098v-1.704h-1.774v-1.916Zm12.421-7.028h-1.774v-1.774h1.774v1.774Zm0 10.648h-1.774v-8.873h1.774v8.873Zm3.55-8.873v1.774h1.774v-1.774h3.549v1.774h-3.549v1.775h-1.774v5.324h-1.775v-8.873h1.775Zm14.196 1.704h1.774v5.465h-1.774v1.704h-3.549v-1.704h-1.775v5.238h-1.774v-12.407h1.774v1.704h1.775v-1.704h3.549v1.704Zm0 5.394v-5.324h-3.549v1.775h-1.775v1.775h1.775v1.774h3.549Zm5.323 1.775h-1.774v-12.422h1.774v12.422Zm3.549-1.775h5.324v-1.774h-5.324v1.774Zm-1.774-1.845h1.774v-1.704h5.324v-1.775h-5.324v-1.774h5.324v1.774h1.774v7.099h-7.098v-1.704h-1.774v-1.916Zm12.421-5.253v1.774h1.775v-1.774h3.549v1.774h1.775v7.099h-1.775v-7.099h-3.549v1.775h-1.775v5.324h-1.774v-8.873h1.774Zm10.648 1.774v1.775h5.323v-1.775h-5.323Zm5.323 7.099h-5.323v-1.775h-1.775v-5.394h1.775v-1.704h5.323v1.704h1.775v3.62h-7.098v1.774h5.323v1.775Z"
-    />
+      fontFamily="'Kroeger 07_55', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji'"
+      fontSize={14.2}
+      textAnchor="middle"
+      dominantBaseline="middle"
+      aria-label={props.label ?? ''}
+    >
+      {props.label ?? ''}
+    </text>
     <path
       fill="#9A9A9A"
       d="M891.698 208.087h7.098v3.549h-7.098zM0 208.087h7.098v3.549H0z"
@@ -1922,6 +2050,6 @@ const Pm1Top = (props: React.SVGProps<SVGSVGElement> & { onMainButtonClick?: () 
       </radialGradient>
     </defs>
   </svg>
-  ))(props)
+))(props)
 )
 export default Pm1Top
