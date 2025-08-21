@@ -405,17 +405,17 @@ const Pm1Top = (props: React.SVGProps<SVGSVGElement> & {
         stroke="#A8A8A8"
         strokeWidth={0.444}
       />
-      {isRunning && activeChannel === 0 && (
+      { activeChannel === 0 && (
         <g filter="url(#LED1)">
           <circle cx={487.994} cy={358.034} r={3.549} fill="#fff" />
         </g>
       )}
-      {isRunning && activeChannel === 1 && (
+      {activeChannel === 1 && (
         <g filter="url(#LED2)">
           <circle cx={568.735} cy={358.034} r={3.549} fill="#fff" />
         </g>
       )}
-      {isRunning && activeChannel === 2 && (
+      {activeChannel === 2 && (
         <g filter="url(#LED3)">
           <circle cx={649.476} cy={358.034} r={3.549} fill="#fff" />
         </g>
