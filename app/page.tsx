@@ -1,7 +1,7 @@
 "use client";
 
 import Pm1Top from "./components/pm1-top";
-// import NoiseSynth from "./components/noise-synth";
+
 import { NoiseSynthEngine, NoiseSynthUI } from "./components/noise-synth";
 
 import SliderTwoPages from "./components/slider-two-pages";
