@@ -1,6 +1,5 @@
 import * as React from "react"
 
-
 const Pm1Top = (props: React.SVGProps<SVGSVGElement> & {
   onPeaceButtonClick?: () => void,
   onChannel1ButtonClick?: () => void,
@@ -19,8 +18,6 @@ const Pm1Top = (props: React.SVGProps<SVGSVGElement> & {
   activeChannel,
   ...rest }) => {
 
-  // const [activeChannel, setActiveChannel] = React.useState('ch1');
-  // const [peaceOn, setPeaceOn] = React.useState(false);
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -114,7 +111,6 @@ const Pm1Top = (props: React.SVGProps<SVGSVGElement> & {
           transformOrigin: 'center',
         }}
         onClick={() => {
-          // setPeaceOn((p) => !p);
           props.onPeaceButtonClick?.();
         }}
         onPointerDown={(e) => {
@@ -405,7 +401,7 @@ const Pm1Top = (props: React.SVGProps<SVGSVGElement> & {
         stroke="#A8A8A8"
         strokeWidth={0.444}
       />
-      { activeChannel === 0 && (
+      {activeChannel === 0 && (
         <g filter="url(#LED1)">
           <circle cx={487.994} cy={358.034} r={3.549} fill="#fff" />
         </g>

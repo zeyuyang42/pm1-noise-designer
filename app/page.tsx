@@ -6,18 +6,19 @@ import { NoiseSynthEngine, NoiseSynthUI } from "./components/noise-synth";
 
 import SliderTwoPages from "./components/slider-two-pages";
 
+
+
 import { useState } from "react";
 
 export default function Home() {
-  const presets: { [key: string]: string } = {
-    Channel1: "white.",
-    Channel2: "pink.",
-    Channel3: "brown.",
-  };
-
-  const [label, setLabel] = useState(presets.Channel1);
+  // const presets: { [key: string]: string } = {
+  //   Channel1: "white.",
+  //   Channel2: "pink.",
+  //   Channel3: "brown.",
+  // };
 
   const engine = NoiseSynthEngine();
+  const [label, setLabel] = useState(engine.state.channelStatus[engine.state.channel].name);
 
   return (
     <div
@@ -31,13 +32,26 @@ export default function Home() {
           <div className="h-full w-full justify-items-center place-content-center place-items-center">
             <Pm1Top
               className="shadow-2xl"
-              onPeaceButtonClick={() => { engine.toggleAudio(); }}
-              onChannel1ButtonClick={() => { engine.applyPreset(0); setLabel(presets.Channel1); }}
-              onChannel2ButtonClick={() => { engine.applyPreset(1); setLabel(presets.Channel2); }}
-              onChannel3ButtonClick={() => { engine.applyPreset(2); setLabel(presets.Channel3); }}
+              onPeaceButtonClick={() => { 
+                engine.controls.switchChannel(engine.state.channel); 
+                setLabel(engine.state.channelStatus[engine.state.channel].name);
+                engine.controls.toggleAudio(); 
+              }}
+              onChannel1ButtonClick={() => { 
+                engine.controls.switchChannel(0); 
+                setLabel(engine.state.channelStatus[0].name);
+              }}
+              onChannel2ButtonClick={() => { 
+                engine.controls.switchChannel(1); 
+                setLabel(engine.state.channelStatus[1].name);
+              }}
+              onChannel3ButtonClick={() => { 
+                engine.controls.switchChannel(2); 
+                setLabel(engine.state.channelStatus[2].name);
+              }}
               label={label}
-              isRunning={engine.running}
-              activeChannel={engine.channel}
+              isRunning={engine.state.running}
+              activeChannel={engine.state.channel}
             />
           </div>
         </section>
