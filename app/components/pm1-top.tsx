@@ -207,10 +207,10 @@ const Pm1Top = (props: React.SVGProps<SVGSVGElement> & {
           transformOrigin: 'center',
         }}
         onClick={() => {
-          if (isRunning) {
+          // if (isRunning) {
             // setActiveChannel('ch1');
             props.onChannel1ButtonClick?.();
-          }
+          // }
         }}
         onPointerDown={(e) => {
           const t = e.currentTarget as SVGGElement;
@@ -252,10 +252,10 @@ const Pm1Top = (props: React.SVGProps<SVGSVGElement> & {
           transformOrigin: 'center',
         }}
         onClick={() => {
-          if (isRunning) {
+          // if (isRunning) {
             // setActiveChannel('ch2');
             props.onChannel2ButtonClick?.();
-          }
+          // }
         }}
         onPointerDown={(e) => {
           const t = e.currentTarget as SVGGElement;
@@ -297,10 +297,10 @@ const Pm1Top = (props: React.SVGProps<SVGSVGElement> & {
           transformOrigin: 'center',
         }}
         onClick={() => {
-          if (isRunning) {
+          // if (isRunning) {
             // setActiveChannel('ch3');
             props.onChannel3ButtonClick?.();
-          }
+          // }
         }}
         onPointerDown={(e) => {
           const t = e.currentTarget as SVGGElement;
